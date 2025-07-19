@@ -13,7 +13,9 @@ export const StockDataSchema = z.object({
   historical: z.array(z.object({ time: z.string(), price: z.number() })).describe('Historical price data for the day.'),
 });
 
-export type AnalyzeCompanyInsightsOutput = AIOutput;
+export type AnalyzeCompanyInsightsOutput = Omit<AIOutput, 'overallSentiment'> & {
+    overallSentiment: string;
+};
 export type Trend = AIOutput['sentimentTrends'][number];
 export type KeyAspect = AIOutput['keyAspects'][number];
 export type StockData = z.infer<typeof StockDataSchema>;

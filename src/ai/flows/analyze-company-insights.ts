@@ -59,12 +59,12 @@ export async function analyzeCompanyInsights(
 const analyzeCompanyInsightsPrompt = ai.definePrompt({
   name: 'analyzeCompanyInsightsPrompt',
   input: {schema: AnalyzeCompanyInsightsInputSchema.pick({ companyName: true, insights: true })},
-  output: {schema: AnalyzeCompanyInsightsOutputSchema.pick({ overallSentiment: true, sentimentTrends: true, keyAspects: true })},
+  output: {schema: AnalyzeCompanyInsightsOutputSchema.pick({ sentimentTrends: true, keyAspects: true })},
   prompt: `You are an AI analyst specializing in understanding company user feedback.
 
 You are given aggregated insights about a company.
 
-Analyze the insights for overall sentiment, trends, and key aspects.
+Analyze the insights for trends and key aspects.
 
 Company Name: {{{companyName}}}
 Insights: {{{insights}}}
@@ -72,11 +72,6 @@ Insights: {{{insights}}}
 Consider these instructions when producing the output:
 - sentimentTrends: determine the trend of the sentiment for a particular aspect of the company.
 - keyAspects: identify the key aspects that the insights are talking about.
-- overallSentiment: Calculate the overall sentiment based on the sentimentTrends. To do this, sum the occurrences for positive, negative, and neutral sentiments across all trends. 
-  - If positive occurrences are significantly higher than negative, the overall sentiment is 'positive'.
-  - If negative occurrences are significantly higher than positive, it's 'negative'.
-  - If positive and negative are very close, the sentiment is 'mixed'.
-  - Otherwise, it's 'neutral'.
 
 Output should be structured as a JSON object.
 `,
@@ -89,14 +84,38 @@ const analyzeCompanyInsightsFlow = ai.defineFlow(
     outputSchema: AnalyzeCompanyInsightsOutputSchema,
   },
   async input => {
-    const {output} = await analyzeCompanyInsightsPrompt(input);
+    const {output: analysisOutput} = await analyzeCompanyInsightsPrompt(input);
 
-    if (!output) {
+    if (!analysisOutput) {
       throw new Error("Could not analyze company insights.");
     }
     
+    const { sentimentTrends } = analysisOutput;
+    
+    const totals = sentimentTrends.reduce((acc, trend) => {
+        acc[trend.sentiment] = (acc[trend.sentiment] || 0) + trend.occurrences;
+        return acc;
+    }, { positive: 0, negative: 0, neutral: 0 });
+
+    let overallSentiment: z.infer<typeof SentimentSchema> = 'neutral';
+    const totalVotes = totals.positive + totals.negative + totals.neutral;
+    
+    if (totalVotes > 0) {
+        const positiveRatio = totals.positive / totalVotes;
+        const negativeRatio = totals.negative / totalVotes;
+
+        if (positiveRatio > 0.6 && positiveRatio > negativeRatio * 2) {
+            overallSentiment = 'positive';
+        } else if (negativeRatio > 0.6 && negativeRatio > positiveRatio * 2) {
+            overallSentiment = 'negative';
+        } else if (Math.abs(positiveRatio - negativeRatio) < 0.15) {
+            overallSentiment = 'mixed';
+        }
+    }
+    
     return {
-        ...output,
+        ...analysisOutput,
+        overallSentiment,
         stock: input.stock,
     };
   }
