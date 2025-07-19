@@ -11,7 +11,7 @@ function OverallSentiment({ sentiment }: { sentiment: string }) {
         positive: {
             icon: <Smile className="w-16 h-16 text-green-500" />,
             text: "Overwhelmingly Positive",
-            badge: "positive" as const,
+            badge: "default" as const,
         },
         negative: {
             icon: <Frown className="w-16 h-16 text-red-500" />,
