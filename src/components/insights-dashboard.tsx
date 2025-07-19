@@ -6,6 +6,7 @@ import { KeyAspectsGrid } from "./key-aspects-grid"
 import { Badge } from "./ui/badge"
 import { Smile, Frown, Meh, Blend } from "lucide-react"
 import { StockPriceChart } from "./stock-price-chart"
+import { StockComparisonForm } from "./stock-comparison-form"
 
 function OverallSentiment({ sentiment }: { sentiment: string }) {
     const sentimentConfig = {
@@ -66,6 +67,9 @@ export function InsightsDashboard({ analysis }: { analysis: AnalyzeCompanyInsigh
       </div>
       <div>
         <KeyAspectsGrid aspects={analysis.keyAspects} />
+      </div>
+      <div className="mt-8">
+        <StockComparisonForm />
       </div>
     </div>
   )
