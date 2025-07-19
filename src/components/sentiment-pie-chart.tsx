@@ -1,3 +1,4 @@
+
 'use client'
 
 import { TrendingUp } from "lucide-react"
@@ -47,7 +48,7 @@ export function SentimentPieChart({ trends }: { trends: Trend[] }) {
   const chartData = Object.entries(sentimentCounts).map(([sentiment, count]) => ({
     sentiment,
     count,
-    fill: chartConfig[sentiment as keyof typeof chartConfig]?.color || 'hsl(var(--muted))'
+    fill: `var(--color-${sentiment})`
   }))
 
   return (
