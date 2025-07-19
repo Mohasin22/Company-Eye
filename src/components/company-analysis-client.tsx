@@ -75,7 +75,7 @@ export function CompanyAnalysisClient() {
 
       <div className="mt-12">
         {pending && <LoadingSkeleton />}
-        {!pending && state.analysis && <InsightsDashboard analysis={state.analysis} comparisonAnalysis={state.comparisonAnalysis} />}
+        {!pending && state.analysis && <InsightsDashboard analysis={state.analysis} />}
         {!pending && !state.analysis && (
           <div className="text-center text-muted-foreground border-2 border-dashed rounded-lg p-12">
             <Telescope className="mx-auto h-12 w-12" />

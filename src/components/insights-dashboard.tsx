@@ -1,4 +1,4 @@
-import type { AnalyzeCompanyInsightsOutput, StockData } from "@/lib/types"
+import type { AnalyzeCompanyInsightsOutput } from "@/lib/types"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { SentimentPieChart } from "./sentiment-pie-chart"
 import { SentimentTrendChart } from "./sentiment-trend-chart"
@@ -6,8 +6,6 @@ import { KeyAspectsGrid } from "./key-aspects-grid"
 import { Badge } from "./ui/badge"
 import { Smile, Frown, Meh, Blend } from "lucide-react"
 import { StockPriceChart } from "./stock-price-chart"
-import { StockComparisonForm } from "./stock-comparison-form"
-import { StockComparisonTable } from "./stock-comparison-table"
 
 function OverallSentiment({ sentiment }: { sentiment: string }) {
     const sentimentConfig = {
@@ -49,7 +47,7 @@ function OverallSentiment({ sentiment }: { sentiment: string }) {
     )
 }
 
-export function InsightsDashboard({ analysis, comparisonAnalysis }: { analysis: AnalyzeCompanyInsightsOutput, comparisonAnalysis?: StockData[] }) {
+export function InsightsDashboard({ analysis }: { analysis: AnalyzeCompanyInsightsOutput }) {
   return (
     <div className="space-y-8">
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -68,10 +66,6 @@ export function InsightsDashboard({ analysis, comparisonAnalysis }: { analysis: 
       </div>
       <div>
         <KeyAspectsGrid aspects={analysis.keyAspects} />
-      </div>
-      <div className="space-y-6">
-        <StockComparisonForm initialCompany={analysis.stock?.ticker} />
-        {comparisonAnalysis && <StockComparisonTable stocks={comparisonAnalysis} />}
       </div>
     </div>
   )
