@@ -25,7 +25,7 @@ function OverallSentiment({ sentiment }: { sentiment: string }) {
         },
     }
 
-    const config = sentimentConfig[sentiment as keyof typeof sentimentConfig] || sentimentConfig.neutral
+    const config = sentimentConfig[sentiment.toLowerCase() as keyof typeof sentimentConfig] || sentimentConfig.neutral
 
     return (
         <Card className="flex flex-col items-center justify-center text-center">
