@@ -3,7 +3,7 @@
 import { aggregateCompanyInsights } from '@/ai/flows/aggregate-company-insights';
 import { analyzeCompanyInsights } from '@/ai/flows/analyze-company-insights';
 import { getStockPrice } from '@/ai/flows/get-stock-price';
-import type { AnalyzeCompanyInsightsOutput } from '@/lib/types';
+import type { AnalyzeCompanyInsightsOutput, StockData } from '@/lib/types';
 import { z } from 'zod';
 
 const FormSchema = z.object({
@@ -40,13 +40,18 @@ export async function getCompanyAnalysis(prevState: FormState, formData: FormDat
         return { message: 'Could not find enough information about this company. Please try a different one.', error: true };
     }
     
-    const analysis = await analyzeCompanyInsights({ companyName, insights: aggregatedResult.value.insights });
-
+    let stockData: StockData | undefined = undefined;
     if (stockResult.status === 'fulfilled') {
-      analysis.stock = stockResult.value;
+      stockData = stockResult.value;
     } else {
       console.warn("Could not fetch stock price:", stockResult.reason)
     }
+
+    const analysis = await analyzeCompanyInsights({ 
+      companyName, 
+      insights: aggregatedResult.value.insights,
+      stock: stockData
+    });
 
     return { message: 'Analysis complete.', analysis };
   } catch (error) {

@@ -9,7 +9,7 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
-import { StockDataSchema } from './analyze-company-insights';
+import { StockDataSchema } from '@/lib/types';
 
 export type StockData = z.infer<typeof StockDataSchema>;
 

@@ -9,23 +9,13 @@
  */
 
 import {ai} from '@/ai/genkit';
+import { StockDataSchema } from '@/lib/types';
 import {z} from 'genkit';
-
-export const StockDataSchema = z.object({
-  ticker: z.string().describe('The stock ticker symbol.'),
-  price: z.number().describe('The current stock price.'),
-  currency: z.string().describe('The currency of the stock price.'),
-  change: z.number().describe('The change in stock price.'),
-  changePercent: z.number().describe('The percentage change in stock price.'),
-  dayHigh: z.number().describe("The stock's highest price for the day."),
-  dayLow: z.number().describe("The stock's lowest price for the day."),
-  marketCap: z.string().describe('The market capitalization of the company.'),
-  historical: z.array(z.object({ time: z.string(), price: z.number() })).describe('Historical price data for the day.'),
-});
 
 const AnalyzeCompanyInsightsInputSchema = z.object({
   companyName: z.string().describe('The name of the company to analyze.'),
   insights: z.string().describe('The aggregated insights about the company.'),
+  stock: StockDataSchema.optional().describe('The stock data for the company.'),
 });
 export type AnalyzeCompanyInsightsInput = z.infer<
   typeof AnalyzeCompanyInsightsInputSchema
@@ -68,7 +58,7 @@ export async function analyzeCompanyInsights(
 
 const analyzeCompanyInsightsPrompt = ai.definePrompt({
   name: 'analyzeCompanyInsightsPrompt',
-  input: {schema: AnalyzeCompanyInsightsInputSchema},
+  input: {schema: AnalyzeCompanyInsightsInputSchema.pick({ companyName: true, insights: true })},
   output: {schema: AnalyzeCompanyInsightsOutputSchema.pick({ overallSentiment: true, sentimentTrends: true, keyAspects: true })},
   prompt: `You are an AI analyst specializing in understanding company user feedback.
 
@@ -92,10 +82,18 @@ const analyzeCompanyInsightsFlow = ai.defineFlow(
   {
     name: 'analyzeCompanyInsightsFlow',
     inputSchema: AnalyzeCompanyInsightsInputSchema,
-    outputSchema: AnalyzeCompanyInsightsOutputSchema.pick({ overallSentiment: true, sentimentTrends: true, keyAspects: true }),
+    outputSchema: AnalyzeCompanyInsightsOutputSchema,
   },
   async input => {
     const {output} = await analyzeCompanyInsightsPrompt(input);
-    return output!;
+
+    if (!output) {
+      throw new Error("Could not analyze company insights.");
+    }
+    
+    return {
+        ...output,
+        stock: input.stock,
+    };
   }
 );
