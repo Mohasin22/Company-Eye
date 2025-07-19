@@ -6,7 +6,7 @@ import { getCompanyAnalysis, type FormState } from '@/app/actions';
 import { useToast } from "@/hooks/use-toast"
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Loader2, ServerCrash, Telescope } from 'lucide-react';
+import { Search, Loader2, Telescope } from 'lucide-react';
 import { InsightsDashboard } from './insights-dashboard';
 import { LoadingSkeleton } from './loading-skeleton';
 
@@ -68,14 +68,14 @@ export function CompanyAnalysisClient() {
             required
             disabled={pending}
           />
-           {state.error && <p className="text-sm text-destructive mt-2">{state.message}</p>}
+           {state.error && !state.analysis && <p className="text-sm text-destructive mt-2">{state.message}</p>}
         </div>
         <SubmitButton />
       </form>
 
       <div className="mt-12">
         {pending && <LoadingSkeleton />}
-        {!pending && state.analysis && <InsightsDashboard analysis={state.analysis} />}
+        {!pending && state.analysis && <InsightsDashboard analysis={state.analysis} comparisonAnalysis={state.comparisonAnalysis} />}
         {!pending && !state.analysis && (
           <div className="text-center text-muted-foreground border-2 border-dashed rounded-lg p-12">
             <Telescope className="mx-auto h-12 w-12" />

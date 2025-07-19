@@ -1,3 +1,4 @@
+
 import type { AnalyzeCompanyInsightsOutput as AIOutput } from '@/ai/flows/analyze-company-insights';
 import { z } from 'zod';
 
@@ -13,9 +14,7 @@ export const StockDataSchema = z.object({
   historical: z.array(z.object({ time: z.string(), price: z.number() })).describe('Historical price data for the day.'),
 });
 
-export type AnalyzeCompanyInsightsOutput = Omit<AIOutput, 'overallSentiment'> & {
-    overallSentiment: string;
-};
+export type AnalyzeCompanyInsightsOutput = AIOutput;
 export type Trend = AIOutput['sentimentTrends'][number];
 export type KeyAspect = AIOutput['keyAspects'][number];
 export type StockData = z.infer<typeof StockDataSchema>;
