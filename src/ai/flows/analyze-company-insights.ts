@@ -67,9 +67,9 @@ Company Name: {{{companyName}}}
 Insights: {{{insights}}}
 
 Consider these instructions when producing the output:
-- overallSentiment: provide the overall sentiment towards the company
 - sentimentTrends: determine the trend of the sentiment for a particular aspect of the company.
 - keyAspects: identify the key aspects that the insights are talking about.
+- overallSentiment: Calculate the overall sentiment based on the sentimentTrends. To do this, sum the occurrences for positive, negative, and neutral sentiments across all trends. If positive occurrences are highest, the overall sentiment is 'positive'. If negative is highest, it's 'negative'. Otherwise, it's 'neutral'.
 
 Output should be structured as a JSON object.
 `,
