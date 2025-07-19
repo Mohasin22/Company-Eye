@@ -21,11 +21,11 @@ export type AnalyzeCompanyInsightsInput = z.infer<
   typeof AnalyzeCompanyInsightsInputSchema
 >;
 
-const SentimentSchema = z.enum(['positive', 'negative', 'neutral']);
+const SentimentSchema = z.enum(['positive', 'negative', 'neutral', 'mixed']);
 
 const TrendSchema = z.object({
   aspect: z.string().describe('The aspect of the company being discussed.'),
-  sentiment: SentimentSchema.describe('The sentiment expressed about the aspect.'),
+  sentiment: z.enum(['positive', 'negative', 'neutral']).describe('The sentiment expressed about the aspect.'),
   occurrences: z.number().describe('The number of times this sentiment was expressed.'),
 });
 
@@ -72,7 +72,11 @@ Insights: {{{insights}}}
 Consider these instructions when producing the output:
 - sentimentTrends: determine the trend of the sentiment for a particular aspect of the company.
 - keyAspects: identify the key aspects that the insights are talking about.
-- overallSentiment: Calculate the overall sentiment based on the sentimentTrends. To do this, sum the occurrences for positive, negative, and neutral sentiments across all trends. If positive occurrences are highest, the overall sentiment is 'positive'. If negative is highest, it's 'negative'. Otherwise, it's 'neutral'.
+- overallSentiment: Calculate the overall sentiment based on the sentimentTrends. To do this, sum the occurrences for positive, negative, and neutral sentiments across all trends. 
+  - If positive occurrences are significantly higher than negative, the overall sentiment is 'positive'.
+  - If negative occurrences are significantly higher than positive, it's 'negative'.
+  - If positive and negative are very close, the sentiment is 'mixed'.
+  - Otherwise, it's 'neutral'.
 
 Output should be structured as a JSON object.
 `,

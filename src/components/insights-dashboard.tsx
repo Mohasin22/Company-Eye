@@ -4,7 +4,7 @@ import { SentimentPieChart } from "./sentiment-pie-chart"
 import { SentimentTrendChart } from "./sentiment-trend-chart"
 import { KeyAspectsGrid } from "./key-aspects-grid"
 import { Badge } from "./ui/badge"
-import { Smile, Frown, Meh } from "lucide-react"
+import { Smile, Frown, Meh, Blend } from "lucide-react"
 import { StockPriceChart } from "./stock-price-chart"
 
 function OverallSentiment({ sentiment }: { sentiment: string }) {
@@ -23,6 +23,11 @@ function OverallSentiment({ sentiment }: { sentiment: string }) {
             icon: <Meh className="w-10 h-10 text-yellow-500" />,
             text: "Largely Neutral",
             badge: "secondary" as const,
+        },
+        mixed: {
+            icon: <Blend className="w-10 h-10 text-blue-500" />,
+            text: "Largely Mixed",
+            badge: "outline" as const,
         },
     }
 
