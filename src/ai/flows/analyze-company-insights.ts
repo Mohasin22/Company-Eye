@@ -11,6 +11,18 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
+export const StockDataSchema = z.object({
+  ticker: z.string().describe('The stock ticker symbol.'),
+  price: z.number().describe('The current stock price.'),
+  currency: z.string().describe('The currency of the stock price.'),
+  change: z.number().describe('The change in stock price.'),
+  changePercent: z.number().describe('The percentage change in stock price.'),
+  dayHigh: z.number().describe("The stock's highest price for the day."),
+  dayLow: z.number().describe("The stock's lowest price for the day."),
+  marketCap: z.string().describe('The market capitalization of the company.'),
+  historical: z.array(z.object({ time: z.string(), price: z.number() })).describe('Historical price data for the day.'),
+});
+
 const AnalyzeCompanyInsightsInputSchema = z.object({
   companyName: z.string().describe('The name of the company to analyze.'),
   insights: z.string().describe('The aggregated insights about the company.'),
@@ -42,6 +54,7 @@ const AnalyzeCompanyInsightsOutputSchema = z.object({
   keyAspects: z
     .array(KeyAspectSchema)
     .describe('Key aspects of the company and user perceptions.'),
+  stock: StockDataSchema.optional().describe('The stock data for the company.'),
 });
 export type AnalyzeCompanyInsightsOutput = z.infer<
   typeof AnalyzeCompanyInsightsOutputSchema
@@ -56,7 +69,7 @@ export async function analyzeCompanyInsights(
 const analyzeCompanyInsightsPrompt = ai.definePrompt({
   name: 'analyzeCompanyInsightsPrompt',
   input: {schema: AnalyzeCompanyInsightsInputSchema},
-  output: {schema: AnalyzeCompanyInsightsOutputSchema},
+  output: {schema: AnalyzeCompanyInsightsOutputSchema.pick({ overallSentiment: true, sentimentTrends: true, keyAspects: true })},
   prompt: `You are an AI analyst specializing in understanding company user feedback.
 
 You are given aggregated insights about a company.
@@ -79,7 +92,7 @@ const analyzeCompanyInsightsFlow = ai.defineFlow(
   {
     name: 'analyzeCompanyInsightsFlow',
     inputSchema: AnalyzeCompanyInsightsInputSchema,
-    outputSchema: AnalyzeCompanyInsightsOutputSchema,
+    outputSchema: AnalyzeCompanyInsightsOutputSchema.pick({ overallSentiment: true, sentimentTrends: true, keyAspects: true }),
   },
   async input => {
     const {output} = await analyzeCompanyInsightsPrompt(input);

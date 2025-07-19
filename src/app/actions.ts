@@ -2,6 +2,7 @@
 
 import { aggregateCompanyInsights } from '@/ai/flows/aggregate-company-insights';
 import { analyzeCompanyInsights } from '@/ai/flows/analyze-company-insights';
+import { getStockPrice } from '@/ai/flows/get-stock-price';
 import type { AnalyzeCompanyInsightsOutput } from '@/lib/types';
 import { z } from 'zod';
 
@@ -30,11 +31,23 @@ export async function getCompanyAnalysis(prevState: FormState, formData: FormDat
   const { companyName } = validatedFields.data;
 
   try {
-    const aggregated = await aggregateCompanyInsights({ companyName });
-    if (!aggregated.insights || aggregated.insights.length < 50) {
+    const [aggregatedResult, stockResult] = await Promise.allSettled([
+        aggregateCompanyInsights({ companyName }),
+        getStockPrice({ companyName }),
+    ]);
+
+    if (aggregatedResult.status === 'rejected' || !aggregatedResult.value.insights || aggregatedResult.value.insights.length < 50) {
         return { message: 'Could not find enough information about this company. Please try a different one.', error: true };
     }
-    const analysis = await analyzeCompanyInsights({ companyName, insights: aggregated.insights });
+    
+    const analysis = await analyzeCompanyInsights({ companyName, insights: aggregatedResult.value.insights });
+
+    if (stockResult.status === 'fulfilled') {
+      analysis.stock = stockResult.value;
+    } else {
+      console.warn("Could not fetch stock price:", stockResult.reason)
+    }
+
     return { message: 'Analysis complete.', analysis };
   } catch (error) {
     console.error(error);
