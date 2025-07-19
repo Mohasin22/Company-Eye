@@ -67,9 +67,9 @@ export function SentimentTrendChart({ trends }: { trends: Trend[] }) {
               content={<ChartTooltipContent />}
             />
              <ChartLegend content={<ChartLegendContent />} />
-            <Bar dataKey="positive" stackId="a" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="neutral" stackId="a" />
-            <Bar dataKey="negative" stackId="a" radius={[0, 0, 0, 0]} />
+            <Bar dataKey="positive" fill="var(--color-positive)" stackId="a" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="neutral" fill="var(--color-neutral)" stackId="a" />
+            <Bar dataKey="negative" fill="var(--color-negative)" stackId="a" radius={[0, 0, 0, 0]} />
           </BarChart>
         </ChartContainer>
       </CardContent>
